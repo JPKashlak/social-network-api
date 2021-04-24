@@ -74,12 +74,31 @@ const thoughtController = {
         Thought.findOneAndDelete({ _id: params.id })
             .then(deletedThought => {
                 if (!deletedThought) {
-                    return res.status(404).json({ message: 'No thought with this ID!'})
+                    return res.status(404).json({ message: 'No thought with that ID'})
                 }
                 res.json(deletedThought);
             })
             .catch(err => res.json(err));
-    }
+    },
+
+    // POST a reaction to a thought api/thoughts/:id/reactions
+    addReaction ({ params, body}, res) {
+        Thought.findOneAndUpdate(
+            { _id: params.thoughtId },
+            { $push: { reactions: body } },
+            { new: true, runValidators: true }
+        )
+        .then(dbThoughtData => {
+            if (!dbThoughtData) {
+                res.status(404).json({ message: 'No thought with that ID' });
+                return;
+            }
+            res.json(dbThoughtData)
+        })
+        .catch(err => res.json(err));
+    },
+
+    // DELETE a reaction to a thought api/thoughts/:id/reactions
 }
 
 module.exports = thoughtController
