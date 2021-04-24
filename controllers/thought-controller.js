@@ -21,7 +21,7 @@ const thoughtController = {
             .select('-__v')
             .then(dbThoughtData => {
                 if (!dbThoughtData) {
-                    res.status(404).json({message: 'No thought found with this id'});
+                    res.status(404).json({message: 'No thought with that id'});
                     return;
                 }
                 res.json(dbThoughtData);
@@ -33,8 +33,53 @@ const thoughtController = {
     },
 
     // POST a new thought api/thoughts
+    createThought({ params, body }, res) {
+        Thought.create(body)
+            .then(({ _id}) => {
+                return User.findOneAndUpdate(
+                    { username: body.username },
+                    { $push: { thoughts: _id } },
+                    { new: true }
+                );
+            })
+            .then(dbUserData => {
+                if (!dbUserData) {
+                    res.status(404).json({ message: 'No user with that username'});
+                    return;
+                }
+                res.json(dbUserData);
+            })
+            .catch(err => res.json(err));
+    },
 
     // PUT update a thought api/thoughts/:id
+    updateThought({ params, body }, res) {
+        Thought.findOneAndUpdate(
+            { _id: params.id },
+            body,
+            { new: true }
+        )
+            .then(dbThoughtData => {
+                if (!dbThoughtData) {
+                    res.status(404).json({ message: 'No thought found with this id' });
+                    return;
+                }
+                res.json(dbThoughtData);
+            })
+            .catch(err => res.status(400).json(err));
+    },
 
     // DELETE a thought api/thoughts/:id
+    deleteThought({ params, body}, res) {
+        Thought.findOneAndDelete({ _id: params.id })
+            .then(deletedThought => {
+                if (!deletedThought) {
+                    return res.status(404).json({ message: 'No thought with this ID!'})
+                }
+                res.json(deletedThought);
+            })
+            .catch(err => res.json(err));
+    }
 }
+
+module.exports = thoughtController
