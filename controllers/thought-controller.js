@@ -88,17 +88,27 @@ const thoughtController = {
             { $push: { reactions: body } },
             { new: true, runValidators: true }
         )
-        .then(dbThoughtData => {
-            if (!dbThoughtData) {
-                res.status(404).json({ message: 'No thought with that ID' });
-                return;
-            }
-            res.json(dbThoughtData)
-        })
-        .catch(err => res.json(err));
+            .then(dbThoughtData => {
+                if (!dbThoughtData) {
+                    res.status(404).json({ message: 'No thought with that ID' });
+                    return;
+                }
+                res.json(dbThoughtData)
+            })
+            .catch(err => res.json(err));
     },
 
     // DELETE a reaction to a thought api/thoughts/:id/reactions
+    deleteReaction({ params }, res) {
+        Thought.findOneAndUpdate(
+            { _id: params.thoughtId },
+            { $pull: { reactions: { reactionId: params.reactionId } } },
+            { new: true }
+        )
+            .then(dbThoughtData => res.json(dbThoughtData))
+            .catch(err => res.json(err));
+    },
+
 }
 
 module.exports = thoughtController
