@@ -34,4 +34,29 @@ const userController = {
             })        
     },
 
+    // POST new user api/users
+    createUser({ body }, res) {
+        User.create(body)
+            .then(dbUserData => res.json(dbUserData))
+            .catch(err => res.status(400).json(err));
+    },
+
+    //PUT update user api/users/:id
+    updateUser({ params, body }, res) {
+        User.findOneAndUpdate({ _id: params.id }, body, { new: true, runValidators: true })
+            .then(dbUserData => {
+                if (!dbUserData) {
+                    res.status(404).json({ message: 'No user with that id' });
+                    return;
+                }
+                res.json(dbUserData);
+            })
+            .catch(err => res.status(400).json(err))
+    },
+
+    //DELETE user api/users/:id
+
+
 }
+
+module.exports = userController
