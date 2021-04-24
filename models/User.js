@@ -1,5 +1,6 @@
 const { Schema, model } = require('mongoose');
 
+
 const UserSchema = new Schema(
     {
         username: {
@@ -12,7 +13,7 @@ const UserSchema = new Schema(
             type: String,
             unique: true,
             required: true,
-            // Need to add validator still!!
+            match: `^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$`
         },
         thoughts: [ThoughtSchema],
         friends: [UserSchema]
@@ -20,7 +21,8 @@ const UserSchema = new Schema(
     {
         toJSON: {
             virtuals: true
-        }
+        },
+        id: false
     }
 )
 

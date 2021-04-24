@@ -1,15 +1,16 @@
-const { Schema, model } = require('mongoose');
+const { Schema, model, Types } = require('mongoose');
 
 const ReactionSchema = new Schema(
     {
         reactionId: {
-            type: Schema.Types.ObjectId,
+            type: Types.ObjectId,
             default: () => new Types.ObjectId()
         },
         reactionBody: {
             type: String,
             required: true,
-            // Set Length Limits
+            minLength: 1,
+            maxLength: 280
         },
         username: {
             type: String,
@@ -18,13 +19,14 @@ const ReactionSchema = new Schema(
         createdAt: {
             type: Date,
             default: Date.now,
-            // Still have to set length limits
+            // Date
         }
     },
     {
         toJSON: {
             getters: true
-        }
+        },
+        id: false
     }
 )
 
@@ -33,7 +35,8 @@ const ThoughtSchema = new Schema(
         thoughtText: {
             type: String,
             required: true,
-            // Still have to set length limits
+            minLength: 1,
+            maxLength: 280
         },
         createdAt: {
             type: Date,
@@ -50,10 +53,15 @@ const ThoughtSchema = new Schema(
         toJSON: {
             virtuals: true,
             getters: true
-        }
+        },
+        id: false
     }
 );
 
 ReactionSchema.virtual('reactionCount').get(function() {
     return this.reactions.length
 })
+
+const Thought = model('Thought', ThoughtSchema)
+
+module.exports = Thought;
